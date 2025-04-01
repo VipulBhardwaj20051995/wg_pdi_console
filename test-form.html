@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WovenGold PDI API Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            display: none;
+        }
+        .api-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .response-output {
+            min-height: 100px;
+            max-height: 300px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WovenGold PDI API Tester</h1>
+        
+        <div class="api-section">
+            <h2>1. Health Check</h2>
+            <button onclick="testHealthCheck()">Test Health Check</button>
+            <div id="health-response" class="response">
+                <h3>Response:</h3>
+                <pre id="health-output" class="response-output"></pre>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>2. Get Indian States</h2>
+            <button onclick="getIndianStates()">Get States</button>
+            <div id="states-response" class="response">
+                <h3>Response:</h3>
+                <pre id="states-output" class="response-output"></pre>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>3. Submit PDI Form</h2>
+            <form id="pdi-form">
+                <div class="form-group">
+                    <label for="customerName">Customer Name:</label>
+                    <input type="text" id="customerName" name="customerName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="state">State:</label>
+                    <select id="state" name="state" required>
+                        <option value="">-- Select a state --</option>
+                        <!-- States will be populated via API -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerEmail">Email:</label>
+                    <input type="email" id="customerEmail" name="customerEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerPhone">Phone Number:</label>
+                    <input type="text" id="customerPhone" name="customerPhone" pattern="[0-9]{10}" title="Phone number must be 10 digits" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="images">Images (up to 4):</label>
+                    <input type="file" id="images" name="images" accept="image/*" multiple>
+                </div>
+                
+                <div class="form-group">
+                    <label for="video">Video:</label>
+                    <input type="file" id="video" name="video" accept="video/*">
+                </div>
+                
+                <button type="button" onclick="submitPDIForm()">Submit PDI Form</button>
+            </form>
+            <div id="submit-response" class="response">
+                <h3>Response:</h3>
+                <pre id="submit-output" class="response-output"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API base URL - change this to match your server
+        const API_BASE_URL = 'http://localhost:9090';
+        
+        // Test Health Check API
+        function testHealthCheck() {
+            fetch(`${API_BASE_URL}/health`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('health-response').style.display = 'block';
+                    document.getElementById('health-output').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('health-response').style.display = 'block';
+                    document.getElementById('health-output').textContent = `Error: ${error.message}`;
+                });
+        }
+        
+        // Get Indian States
+        function getIndianStates() {
+            fetch(`${API_BASE_URL}/api/pdi/states`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('states-response').style.display = 'block';
+                    document.getElementById('states-output').textContent = JSON.stringify(data, null, 2);
+                    
+                    // Populate the states dropdown
+                    const stateSelect = document.getElementById('state');
+                    // Clear existing options
+                    stateSelect.innerHTML = '<option value="">-- Select a state --</option>';
+                    
+                    // Add states to dropdown
+                    data.forEach(state => {
+                        const option = document.createElement('option');
+                        option.value = state;
+                        option.textContent = state;
+                        stateSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    document.getElementById('states-response').style.display = 'block';
+                    document.getElementById('states-output').textContent = `Error: ${error.message}`;
+                });
+        }
+        
+        // Submit PDI Form
+        function submitPDIForm() {
+            const form = document.getElementById('pdi-form');
+            const formData = new FormData();
+            
+            // Add text fields
+            formData.append('customerName', document.getElementById('customerName').value);
+            formData.append('state', document.getElementById('state').value);
+            formData.append('customerEmail', document.getElementById('customerEmail').value);
+            formData.append('customerPhone', document.getElementById('customerPhone').value);
+            
+            // Add image files
+            const imageFiles = document.getElementById('images').files;
+            for (let i = 0; i < imageFiles.length; i++) {
+                formData.append('images', imageFiles[i]);
+            }
+            
+            // Add video file
+            const videoFile = document.getElementById('video').files[0];
+            if (videoFile) {
+                formData.append('video', videoFile);
+            }
+            
+            // Submit the form
+            fetch(`${API_BASE_URL}/api/pdi/submit`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('submit-response').style.display = 'block';
+                document.getElementById('submit-output').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                document.getElementById('submit-response').style.display = 'block';
+                document.getElementById('submit-output').textContent = `Error: ${error.message}`;
+            });
+        }
+        
+        // Load states when the page loads
+        window.onload = function() {
+            getIndianStates();
+        };
+    </script>
+</body>
+</html> 
