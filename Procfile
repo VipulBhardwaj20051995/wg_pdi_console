@@ -1,1 +1,1 @@
-web: java -jar application.jar --server.port=5000 
+web: java -jar wovengold-pdi-0.0.1-SNAPSHOT.jar 

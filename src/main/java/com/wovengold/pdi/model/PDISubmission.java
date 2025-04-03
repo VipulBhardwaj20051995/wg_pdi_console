@@ -28,9 +28,8 @@ public class PDISubmission {
     @Column(nullable = false)
     private String customerPhone;
 
-    @ElementCollection
-    @CollectionTable(name = "pdi_images")
-    private List<String> imageUrls;
+    @OneToMany(mappedBy = "pdiSubmission", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PDIImage> imageUrls;
 
     @Column
     private String videoUrl;
@@ -44,8 +43,19 @@ public class PDISubmission {
     @Column
     private boolean smsSent;
 
+    @Column(name = "tub_serial_no")
+    private String tubSerialNo;
+
     @PrePersist
     protected void onCreate() {
         submissionDate = LocalDateTime.now();
+    }
+
+    public String getTubSerialNo() {
+        return tubSerialNo;
+    }
+
+    public void setTubSerialNo(String tubSerialNo) {
+        this.tubSerialNo = tubSerialNo;
     }
 } 

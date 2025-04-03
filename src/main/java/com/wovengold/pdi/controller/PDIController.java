@@ -44,6 +44,7 @@ public class PDIController {
             @RequestParam("customerName") @NotBlank(message = "Customer name is required") String customerName,
             @RequestParam("state") @NotBlank(message = "State is required") String state,
             @RequestParam("model") @NotBlank(message = "Model is required") String model,
+            @RequestParam("tubSerialNo")  String tubSerialNo,
             @RequestParam("customerEmail") @NotBlank(message = "Email is required") @Email(message = "Invalid email format") String customerEmail,
             @RequestParam("customerPhone") @NotBlank(message = "Phone number is required") @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits") String customerPhone,
             @RequestParam(value = "images", required = false) List<MultipartFile> images,
@@ -55,6 +56,7 @@ public class PDIController {
         request.setCustomerName(customerName);
         request.setState(state);
         request.setModel(model);
+        request.setTubSerialNo(tubSerialNo);
         request.setCustomerEmail(customerEmail);
         request.setCustomerPhone(customerPhone);
         request.setImages(images);

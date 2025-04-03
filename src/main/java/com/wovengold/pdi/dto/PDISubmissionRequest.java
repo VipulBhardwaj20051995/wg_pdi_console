@@ -30,6 +30,8 @@ public class PDISubmissionRequest {
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits")
     private String customerPhone;
 
+    private String tubSerialNo;
+
     private List<MultipartFile> images;
     private MultipartFile video;
 }
